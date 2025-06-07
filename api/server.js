@@ -17,25 +17,6 @@ const DIST_DIR = path.join(__dirname, '../dist');
 app.use(express.json());
 app.use(cors());
 
-if (process.env.NODE_ENV === 'production') {
-    if (!existsSync(DIST_DIR)) {
-        console.error('Error: Production build not found. Run npm run build first.');
-        process.exit(1);
-    }
-    app.use(express.static(DIST_DIR));
-
-  // Fallback for SPA routing in production
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api/')) return next();
-    res.sendFile(path.join(DIST_DIR, 'index.html'));
-  });
-} else {
-  // In development, redirect root to frontend dev server
-  app.get('/', (req, res) => {
-    res.redirect('http://localhost:5173');
-  });
-}
-
 // API endpoints to find state file
 const handleFindState = async (req, res) => {
     try {
@@ -180,14 +161,42 @@ const handleFindState = async (req, res) => {
 app.post('/api/find-state', handleFindState);
 app.get('/api/find-state', handleFindState);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify({
-        status: 200,
-        message: 'OK'
-    }, null, 2) + '\n');
-});
+// Health check endpoint - support both GET and POST
+app.route('/health')
+    .get((req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify({
+            status: 200,
+            message: 'OK'
+        }, null, 2) + '\n');
+    })
+    .post((req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify({
+            status: 200,
+            message: 'OK'
+        }, null, 2) + '\n');
+    });
+
+if (process.env.NODE_ENV === 'production') {
+    if (!existsSync(DIST_DIR)) {
+        console.error('Error: Production build not found. Run npm run build first.');
+        process.exit(1);
+    }
+    app.use(express.static(DIST_DIR));
+
+  // Fallback for SPA routing in production
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    if (req.path === '/health') return next(); // <-- додано, щоб не перехоплювати /health
+    res.sendFile(path.join(DIST_DIR, 'index.html'));
+  });
+} else {
+  // In development, redirect root to frontend dev server
+  app.get('/', (req, res) => {
+    res.redirect('http://localhost:5173');
+  });
+}
 
 // Error handler
 app.use((err, req, res, next) => {

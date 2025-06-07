@@ -13,8 +13,13 @@
   ],
   "routes": [
     {
+      "src": "/health",
+      "methods": ["GET", "POST"],
+      "dest": "/api/index.js"
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "api/index.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/(.*)",
