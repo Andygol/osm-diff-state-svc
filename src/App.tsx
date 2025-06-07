@@ -23,6 +23,9 @@ import {
   Link,
 } from '@mui/material'
 import { ContentCopy, ExpandMore, Help, GitHub } from '@mui/icons-material'
+import { inject } from '@vercel/analytics';
+
+inject();
 
 interface StateResponse {
   status: number
