@@ -1,7 +1,7 @@
 {
-  "name": "osm-diff-state",
+  "name": "osm-diff-state-svc",
   "homepage": "https://osm-diff-state-svc.vercel.app/",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "API for OpenStreetMap Diff State Finder with Web UI and GET/POST capabilities",
   "type": "module",
   "scripts": {
